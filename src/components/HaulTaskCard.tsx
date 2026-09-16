@@ -19,7 +19,7 @@ export function HaulTaskCard({ tripStage, tripNumber, totalTripsTarget, onAdvanc
           target: 'Экскаватор ЭКГ-5А #2 (Горизонт +1620м)',
           dist: 'Расстояние: 3.2 км',
           actionText: 'ПРИБЫЛ В ЗАБОЙ',
-          actionColor: 'from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500',
+          actionColor: 'from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-blue-500/20',
         };
       case 'LOADING':
         return {
@@ -27,7 +27,7 @@ export function HaulTaskCard({ tripStage, tripNumber, totalTripsTarget, onAdvanc
           target: 'ЭКГ-5А #2 • Загрузка ковш #3 / 5',
           dist: 'Осталось: ~1.5 мин',
           actionText: 'ПОГРУЗКА ЗАВЕРШЕНА',
-          actionColor: 'from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600',
+          actionColor: 'from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 shadow-amber-500/20',
         };
       case 'TO_DUMP':
         return {
@@ -35,7 +35,7 @@ export function HaulTaskCard({ tripStage, tripNumber, totalTripsTarget, onAdvanc
           target: 'Отвал Восток (Приемный бункер ДСК-1)',
           dist: 'Расстояние: 3.4 км',
           actionText: 'НА ОТВАЛЕ',
-          actionColor: 'from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600',
+          actionColor: 'from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 shadow-emerald-500/20',
         };
       case 'UNLOADING':
         return {
@@ -43,7 +43,7 @@ export function HaulTaskCard({ tripStage, tripNumber, totalTripsTarget, onAdvanc
           target: 'Бункер #1 • Контроль габаритов',
           dist: 'Осталось: ~45 сек',
           actionText: 'СЛЕДУЮЩИЙ РЕЙС',
-          actionColor: 'from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500',
+          actionColor: 'from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-blue-500/20',
         };
     }
   };
@@ -51,36 +51,36 @@ export function HaulTaskCard({ tripStage, tripNumber, totalTripsTarget, onAdvanc
   const details = getStageDetails();
 
   return (
-    <div className="bg-[#151b24] border-2 border-[#e59b2b]/40 rounded-3xl p-5 flex items-center justify-between shadow-2xl">
-      <div className="flex-1 pr-6">
-        <div className="flex items-center gap-3 mb-1.5">
-          <span className="px-3 py-1 bg-amber-500/15 border border-amber-500/30 text-amber-400 rounded-full text-xs font-bold font-mono uppercase tracking-wider">
+    <div className="bg-white border-2 border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+      <div className="flex-1 pr-4">
+        <div className="flex items-center gap-3 mb-1">
+          <span className="px-3 py-0.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-full text-xs font-black font-mono uppercase tracking-wider">
             Рейс #{tripNumber} / {totalTripsTarget}
           </span>
-          <span className="text-xs font-medium text-slate-400">
-            Тип: <span className="text-emerald-400 font-bold">Руда золотосодержащая</span>
+          <span className="text-xs font-semibold text-slate-600">
+            Тип: <span className="text-emerald-700 font-bold">Руда товарная</span>
           </span>
-          <span className="text-xs text-slate-500 font-mono">• Плечо: 3.2 км</span>
+          <span className="text-xs text-slate-400 font-mono">• Плечо: 3.2 км</span>
         </div>
 
-        <div className="text-xl font-black text-slate-100 flex items-center gap-2.5">
-          <MapPin className="w-6 h-6 text-amber-400 shrink-0" />
+        <div className="text-lg font-black text-slate-900 flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-blue-600 shrink-0" />
           <span>{details.target}</span>
         </div>
 
-        <div className="text-xs text-slate-400 mt-0.5 font-medium flex items-center gap-2">
+        <div className="text-xs text-slate-500 mt-0.5 font-medium flex items-center gap-2">
           <span>{details.title}</span>
-          <span className="font-mono text-cyan-300">({details.dist})</span>
+          <span className="font-mono text-blue-700 font-bold">({details.dist})</span>
         </div>
       </div>
 
-      {/* Большая сенсорная кнопка действия водителя */}
+      {/* Сенсорная кнопка действия водителя */}
       <button
         onClick={onAdvanceStage}
-        className={`px-8 py-5 bg-gradient-to-r ${details.actionColor} text-white font-black text-base tracking-wider uppercase rounded-2xl flex items-center gap-3 shadow-xl transition transform active:scale-95 shrink-0`}
+        className={`px-7 py-4 bg-gradient-to-r ${details.actionColor} text-white font-black text-sm tracking-wider uppercase rounded-xl flex items-center gap-2.5 shadow-md transition transform active:scale-95 shrink-0`}
       >
         <span>{details.actionText}</span>
-        <ArrowRight className="w-6 h-6" />
+        <ArrowRight className="w-5 h-5" />
       </button>
     </div>
   );

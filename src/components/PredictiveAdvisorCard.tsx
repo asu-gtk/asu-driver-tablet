@@ -34,58 +34,58 @@ export function PredictiveAdvisorCard({
       case 'LOW_FUEL':
         return {
           badge: 'КРИТИЧЕСКИЙ ОСТАТОК ТОПЛИВА',
-          badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/40',
+          badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
           title: 'Остаток в баке: 75 л (~45 мин работы)',
           prediction: 'Прогноз: топлива не хватит на следующий полный рейс с подъемом на Отвал Восток (+7%).',
           recommendation: 'Рекомендация ИИ: После разгрузки текущего рейса #14 свернуть на АТЗ-04 (Горизонт +1640, плечо 600м).',
           actionText: 'ПРИНЯТЬ ЗАЕЗД НА АЗС',
-          icon: <Fuel className="w-5 h-5 text-amber-400 animate-bounce" />,
-          borderStyle: 'border-amber-500/60 shadow-amber-500/10',
+          icon: <Fuel className="w-5 h-5 text-amber-600 animate-bounce" />,
+          borderStyle: 'border-amber-300 shadow-amber-500/10',
         };
       case 'OBSTACLE':
         return {
           badge: 'ОПАСНОСТЬ НА МАРШРУТЕ • ИНЦИДЕНТ',
-          badgeColor: 'bg-red-500/20 text-red-400 border-red-500/40',
+          badgeColor: 'bg-red-100 text-red-900 border-red-300',
           title: 'Осыпь скальной породы на участке «Вираж Юг» (ПК-18)',
           prediction: 'Прогноз: полная блокировка проезда. Риск повреждения шин и задержки рейса на 40+ минут.',
           recommendation: 'Рекомендация ИИ: Маршрут автоматически перестроен в объезд через технологический вираж Сектор-2 (+350 м).',
           actionText: 'ПОДТВЕРДИТЬ ОБЪЕЗД',
-          icon: <Construction className="w-5 h-5 text-red-400 animate-pulse" />,
-          borderStyle: 'border-red-500/60 shadow-red-500/15',
+          icon: <Construction className="w-5 h-5 text-red-600 animate-pulse" />,
+          borderStyle: 'border-red-300 shadow-red-500/10',
         };
       case 'OVERLOAD':
         return {
           badge: 'ПРЕДУПРЕЖДЕНИЕ ПО БЕЗОПАСНОСТИ',
-          badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/40',
+          badgeColor: 'bg-orange-100 text-orange-900 border-orange-300',
           title: 'Перегруз кузова: 138.4 т (+8.4 т выше нормы)',
           prediction: 'Прогноз: повышенный нагрев шин (индекс TKPH > 420) и риск отказа тормозной системы на уклоне -6%.',
           recommendation: 'Рекомендация ИИ: Активировать гидродинамический ретардер, ограничить скорость спуска до 20 км/ч.',
           actionText: 'ПОНЯЛ, СНИЖАЮ СКОРОСТЬ',
-          icon: <AlertTriangle className="w-5 h-5 text-orange-400" />,
-          borderStyle: 'border-orange-500/60 shadow-orange-500/10',
+          icon: <AlertTriangle className="w-5 h-5 text-orange-600" />,
+          borderStyle: 'border-orange-300 shadow-orange-500/10',
         };
       case 'QUEUE_REROUTE':
         return {
           badge: 'ОПТИМИЗАЦИЯ ТРАФИКА В ЗАБОЕ',
-          badgeColor: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40',
+          badgeColor: 'bg-blue-100 text-blue-900 border-blue-300',
           title: 'Очередь под погрузку в забое ЭКГ-5А #2 (>3 машин)',
           prediction: 'Прогноз: простой под экскаватором 12 минут. Потеря производительности -38 т/час.',
           recommendation: 'Рекомендация ИИ: Симплекс перенаправил на свободный экскаватор Hitachi EX3600 (Забой #7, время подачи 0 мин).',
           actionText: 'СЛЕДОВАТЬ НА ЗАБОЙ #7',
-          icon: <Sparkles className="w-5 h-5 text-cyan-400" />,
-          borderStyle: 'border-cyan-500/60 shadow-cyan-500/10',
+          icon: <Sparkles className="w-5 h-5 text-blue-600" />,
+          borderStyle: 'border-blue-300 shadow-blue-500/10',
         };
       case 'NORMAL':
       default:
         return {
           badge: 'ПРЕДИКТИВНЫЙ АССИСТЕНТ • ШТАТНЫЙ РЕЖИМ',
-          badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
+          badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
           title: 'Трасса свободна, параметры машины в норме',
           prediction: 'Прогноз: сменный план (18 рейсов) будет выполнен к 19:20 с опережением графика на 15 минут.',
           recommendation: 'Рекомендация ИИ: Держать крейсерскую скорость 28–30 км/ч для оптимального расхода топлива (0.158 л/т).',
           actionText: 'РЕЙС В ГРАФИКЕ',
-          icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
-          borderStyle: 'border-[#232c3b]',
+          icon: <CheckCircle2 className="w-5 h-5 text-emerald-600" />,
+          borderStyle: 'border-slate-200',
         };
     }
   };
@@ -93,9 +93,9 @@ export function PredictiveAdvisorCard({
   const c = getScenarioContent();
 
   return (
-    <div className={`bg-[#151b24] border-2 ${c.borderStyle} rounded-3xl p-4 shadow-xl flex flex-col justify-between transition-all duration-300`}>
+    <div className={`bg-white border-2 ${c.borderStyle} rounded-2xl p-3.5 shadow-sm flex flex-col justify-between transition-all duration-300`}>
       {/* Шапка предиктивного блока */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
           {c.icon}
           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black font-mono tracking-wider uppercase border ${c.badgeColor}`}>
@@ -107,7 +107,7 @@ export function PredictiveAdvisorCard({
           <button
             onClick={onToggleVoice}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${
-              voiceEnabled ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-[#1e2736] text-slate-400'
+              voiceEnabled ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-500'
             }`}
           >
             {voiceEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -117,23 +117,22 @@ export function PredictiveAdvisorCard({
       </div>
 
       {/* Текст ситуации и прогноз */}
-      <div className="space-y-1 mb-3">
-        <div className="text-sm font-extrabold text-slate-100">{c.title}</div>
-        <div className="text-xs text-slate-400 font-medium">{c.prediction}</div>
-        <div className="text-xs text-amber-300 font-bold bg-[#1b2330] p-2.5 rounded-xl border border-[#2b394f]">
+      <div className="space-y-1 mb-2.5">
+        <div className="text-sm font-extrabold text-slate-900">{c.title}</div>
+        <div className="text-xs text-slate-600 font-medium">{c.prediction}</div>
+        <div className="text-xs text-slate-900 font-bold bg-amber-50 p-2 rounded-xl border border-amber-200">
           {c.recommendation}
         </div>
       </div>
 
       {/* Кнопка действия + Переключатель симуляции для демонстрации */}
-      <div className="flex items-center justify-between gap-3 pt-1 border-t border-[#232c3b]">
-        {/* Кнопки симуляции различных ситуаций */}
+      <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
         <div className="flex items-center gap-1 overflow-x-auto">
-          <span className="text-[10px] uppercase font-bold text-slate-500 mr-1">Тест сценариев:</span>
+          <span className="text-[10px] uppercase font-bold text-slate-400 mr-1">Тест:</span>
           <button
             onClick={() => onSelectScenario('NORMAL')}
             className={`px-2 py-1 rounded-lg text-[10px] font-bold transition ${
-              scenario === 'NORMAL' ? 'bg-emerald-500 text-slate-950' : 'bg-[#1b2330] text-slate-400 hover:text-slate-200'
+              scenario === 'NORMAL' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             Норма
@@ -141,23 +140,23 @@ export function PredictiveAdvisorCard({
           <button
             onClick={() => onSelectScenario('LOW_FUEL')}
             className={`px-2 py-1 rounded-lg text-[10px] font-bold transition ${
-              scenario === 'LOW_FUEL' ? 'bg-amber-500 text-slate-950' : 'bg-[#1b2330] text-slate-400 hover:text-slate-200'
+              scenario === 'LOW_FUEL' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            Мало топлива
+            Топливо
           </button>
           <button
             onClick={() => onSelectScenario('OBSTACLE')}
             className={`px-2 py-1 rounded-lg text-[10px] font-bold transition ${
-              scenario === 'OBSTACLE' ? 'bg-red-500 text-white' : 'bg-[#1b2330] text-slate-400 hover:text-slate-200'
+              scenario === 'OBSTACLE' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            Осыпь дороги
+            Осыпь
           </button>
           <button
             onClick={() => onSelectScenario('OVERLOAD')}
             className={`px-2 py-1 rounded-lg text-[10px] font-bold transition ${
-              scenario === 'OVERLOAD' ? 'bg-orange-500 text-slate-950' : 'bg-[#1b2330] text-slate-400 hover:text-slate-200'
+              scenario === 'OVERLOAD' ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             Перегруз
@@ -165,19 +164,19 @@ export function PredictiveAdvisorCard({
           <button
             onClick={() => onSelectScenario('QUEUE_REROUTE')}
             className={`px-2 py-1 rounded-lg text-[10px] font-bold transition ${
-              scenario === 'QUEUE_REROUTE' ? 'bg-cyan-500 text-slate-950' : 'bg-[#1b2330] text-slate-400 hover:text-slate-200'
+              scenario === 'QUEUE_REROUTE' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            Очередь забой
+            Очередь
           </button>
         </div>
 
         <button
           onClick={onAcceptRecommendation}
-          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"
+          className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black text-xs uppercase tracking-wider rounded-xl flex items-center gap-1 transition shadow-sm shrink-0"
         >
           <span>{c.actionText}</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>

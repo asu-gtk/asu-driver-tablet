@@ -17,7 +17,6 @@ export default function App() {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
 
-  // Обработка смены сценария с озвучкой
   const handleSelectScenario = (s: ScenarioType) => {
     setScenario(s);
 
@@ -72,7 +71,6 @@ export default function App() {
     setTimeout(() => setActiveAlert(null), 3500);
   };
 
-  // Имитация телеметрии скорости и датчиков
   useEffect(() => {
     const timer = setInterval(() => {
       setSpeed((prev) => {
@@ -115,7 +113,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#0e1218] p-3.5 flex flex-col gap-2.5 font-sans overflow-hidden select-none">
+    <div className="h-screen w-screen bg-slate-100 p-3.5 flex flex-col gap-2.5 font-sans overflow-hidden select-none">
       {/* Верхний статус-бар планшета */}
       <TopStatusBar
         truckId="101"
@@ -132,7 +130,7 @@ export default function App() {
 
       {/* Оповещение быстрого действия */}
       {activeAlert && (
-        <div className="bg-amber-500 text-slate-950 px-6 py-2 rounded-2xl font-black text-center text-xs tracking-wider uppercase shadow-xl transition animate-fade-in">
+        <div className="bg-blue-600 text-white px-6 py-2 rounded-xl font-black text-center text-xs tracking-wider uppercase shadow-md transition animate-fade-in">
           {activeAlert}
         </div>
       )}
@@ -155,7 +153,6 @@ export default function App() {
 
         {/* Правая колонка: Предиктивный ассистент ИИ, приборы HUD, тензодатчики */}
         <div className="col-span-4 flex flex-col gap-2.5 min-h-0 overflow-y-auto pr-0.5">
-          {/* Блок предиктивного советника (Что делать дальше) */}
           <PredictiveAdvisorCard
             scenario={scenario}
             voiceEnabled={voiceEnabled}
@@ -164,7 +161,6 @@ export default function App() {
             onAcceptRecommendation={handleAcceptRecommendation}
           />
 
-          {/* Приборы HUD */}
           <GaugesPanel
             speed={speed}
             payload={payload}

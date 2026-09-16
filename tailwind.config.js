@@ -8,17 +8,20 @@ export default {
     extend: {
       colors: {
         mining: {
-          bg: '#0e1218',
-          surface: '#151b24',
-          card: '#1b222e',
-          border: '#2a3547',
-          amber: '#e59b2b',
-          amberLight: '#fbb347',
-          emerald: '#10b981',
-          cyan: '#38bdf8',
-          crimson: '#ef4444',
-          textMuted: '#8b9bb4',
-          textBase: '#e2e8f0',
+          bg: '#f8fafc',
+          surface: '#ffffff',
+          card: '#ffffff',
+          border: '#e2e8f0',
+          borderStrong: '#cbd5e1',
+          primary: '#1e40af',
+          primaryHover: '#1d4ed8',
+          amber: '#d97706',
+          emerald: '#059669',
+          cyan: '#0284c7',
+          crimson: '#dc2626',
+          textBase: '#0f172a',
+          textMuted: '#64748b',
+          textSubtle: '#94a3b8',
         }
       },
       fontFamily: {
