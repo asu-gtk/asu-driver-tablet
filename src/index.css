@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-mining-bg text-slate-100;
+    touch-action: manipulation;
+  }
+}
