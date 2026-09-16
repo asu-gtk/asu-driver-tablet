@@ -1,32 +1,54 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Compass, Navigation2, ShieldCheck, ZoomIn, ZoomOut, AlertTriangle } from 'lucide-react';
+import { Compass, Navigation2, ShieldCheck, ZoomIn, ZoomOut, AlertTriangle, Fuel, Construction } from 'lucide-react';
+import { ScenarioType } from './PredictiveAdvisorCard';
 
 interface Waypoint {
   x: number;
   y: number;
   label: string;
   sub: string;
-  type: 'loading' | 'dump' | 'turn' | 'fork';
+  type: 'loading' | 'dump' | 'turn' | 'fork' | 'fuel' | 'obstacle';
   altitude: number;
 }
 
-export function NavigationMap({ speed }: { speed: number }) {
+export function NavigationMap({ speed, scenario }: { speed: number; scenario: ScenarioType }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [progress, setProgress] = useState(0.28);
   const [zoom, setZoom] = useState(1);
 
-  // Трасса карьера: координаты контрольных точек
-  const waypoints: Waypoint[] = [
-    { x: 90, y: 340, label: 'ЭКГ-5А #2', sub: 'Забой 1620', type: 'loading', altitude: 1620 },
-    { x: 170, y: 270, label: 'Вираж Юг', sub: 'R=40м, уклон -4%', type: 'turn', altitude: 1630 },
+  // Штатные контрольные точки трассы карьера
+  const standardWaypoints: Waypoint[] = [
+    { x: 90, y: 340, label: 'ЭКГ-5А #2', sub: 'Забой +1620', type: 'loading', altitude: 1620 },
+    { x: 170, y: 270, label: 'Вираж Юг', sub: 'R=40м', type: 'turn', altitude: 1630 },
     { x: 290, y: 220, label: 'Разъезд #3', sub: 'Двухполосный', type: 'fork', altitude: 1648 },
     { x: 410, y: 130, label: 'Трасса Восток', sub: 'Уклон +7%', type: 'turn', altitude: 1665 },
     { x: 540, y: 70, label: 'Отвал Восток', sub: 'Приемный бункер', type: 'dump', altitude: 1680 },
   ];
 
-  // Встречные/попутные самосвалы
+  // Трасса в объезд при осыпи скалы (OBSTACLE)
+  const detourWaypoints: Waypoint[] = [
+    { x: 90, y: 340, label: 'ЭКГ-5А #2', sub: 'Забой +1620', type: 'loading', altitude: 1620 },
+    { x: 140, y: 310, label: 'Съезд на объезд', sub: 'ПК-12', type: 'fork', altitude: 1625 },
+    { x: 230, y: 330, label: 'Тех. вираж Сектор-2', sub: 'Объезд осыпи (+350м)', type: 'turn', altitude: 1635 },
+    { x: 340, y: 250, label: 'Выезд на Трассу #4', sub: 'Безопасный участок', type: 'fork', altitude: 1650 },
+    { x: 410, y: 130, label: 'Трасса Восток', sub: 'Уклон +7%', type: 'turn', altitude: 1665 },
+    { x: 540, y: 70, label: 'Отвал Восток', sub: 'Приемный бункер', type: 'dump', altitude: 1680 },
+  ];
+
+  // Маршрут через АТЗ-04 при низком топливе (LOW_FUEL)
+  const fuelWaypoints: Waypoint[] = [
+    { x: 90, y: 340, label: 'ЭКГ-5А #2', sub: 'Забой +1620', type: 'loading', altitude: 1620 },
+    { x: 170, y: 270, label: 'Вираж Юг', sub: 'R=40м', type: 'turn', altitude: 1630 },
+    { x: 250, y: 240, label: 'Заправщик АТЗ-04', sub: 'Горизонт +1640', type: 'fuel', altitude: 1640 },
+    { x: 410, y: 130, label: 'Трасса Восток', sub: 'Уклон +7%', type: 'turn', altitude: 1665 },
+    { x: 540, y: 70, label: 'Отвал Восток', sub: 'Приемный бункер', type: 'dump', altitude: 1680 },
+  ];
+
+  const waypoints = scenario === 'OBSTACLE' ? detourWaypoints : scenario === 'LOW_FUEL' ? fuelWaypoints : standardWaypoints;
+
+  // Встречные самосвалы
   const nearbyVehicles = [
-    { x: 330, y: 195, code: 'БелАЗ-104', status: 'Встречный (порожний)', dist: '240 м' },
+    { x: 330, y: 195, code: 'БелАЗ-104', status: 'Встречный', dist: '240 м' },
     { x: 130, y: 300, code: 'БелАЗ-108', status: 'В забое', dist: '620 м' },
   ];
 
@@ -51,7 +73,7 @@ export function NavigationMap({ speed }: { speed: number }) {
     ctx.fillStyle = '#111622';
     ctx.fillRect(0, 0, w, h);
 
-    // Координатная сетка карьера (пикеты) - приглушенная
+    // Координатная сетка карьера (пикеты)
     ctx.strokeStyle = '#1b2333';
     ctx.lineWidth = 1;
     for (let x = 0; x < w; x += 40) {
@@ -67,7 +89,7 @@ export function NavigationMap({ speed }: { speed: number }) {
       ctx.stroke();
     }
 
-    // Изолинии уступов карьера (мягкие теплые контуры)
+    // Изолинии уступов карьера
     ctx.strokeStyle = '#222d42';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([6, 6]);
@@ -82,9 +104,9 @@ export function NavigationMap({ speed }: { speed: number }) {
     });
     ctx.setLineDash([]);
 
-    // Основание технологической автодороги (широкая темная полоса)
+    // Отрисовка технологической автодороги
     ctx.strokeStyle = '#1a2232';
-    ctx.lineWidth = 32;
+    ctx.lineWidth = 30;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
@@ -94,9 +116,8 @@ export function NavigationMap({ speed }: { speed: number }) {
     }
     ctx.stroke();
 
-    // Покрытие дороги
     ctx.strokeStyle = '#28354d';
-    ctx.lineWidth = 24;
+    ctx.lineWidth = 22;
     ctx.beginPath();
     ctx.moveTo(waypoints[0].x, waypoints[0].y);
     for (let i = 1; i < waypoints.length; i++) {
@@ -104,8 +125,8 @@ export function NavigationMap({ speed }: { speed: number }) {
     }
     ctx.stroke();
 
-    // Активный маршрут следования (Теплый матовый янтарный, высокая различимость)
-    ctx.strokeStyle = '#e59b2b';
+    // Маршрутная линия навигатора
+    ctx.strokeStyle = scenario === 'OBSTACLE' ? '#ef4444' : scenario === 'LOW_FUEL' ? '#f59e0b' : '#e59b2b';
     ctx.lineWidth = 6;
     ctx.beginPath();
     ctx.moveTo(waypoints[0].x, waypoints[0].y);
@@ -114,10 +135,36 @@ export function NavigationMap({ speed }: { speed: number }) {
     }
     ctx.stroke();
 
+    // Если есть осыпь / инцидент (OBSTACLE), рисуем маркер блокировки на старом участке
+    if (scenario === 'OBSTACLE') {
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(170, 270, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.fillStyle = '#fca5a5';
+      ctx.fillText('⚠ ЗАТОР / ОСЫПЬ ПОРОДЫ (ПК-18)', 190, 274);
+    }
+
+    // Если заправка (LOW_FUEL), выделяем точку АЗС
+    if (scenario === 'LOW_FUEL') {
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(250, 240, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
     // Контрольные точки навигации
     waypoints.forEach((pt) => {
       const isEndpoint = pt.type === 'loading' || pt.type === 'dump';
-      ctx.fillStyle = pt.type === 'loading' ? '#e59b2b' : pt.type === 'dump' ? '#10b981' : '#38bdf8';
+      ctx.fillStyle = pt.type === 'loading' ? '#e59b2b' : pt.type === 'dump' ? '#10b981' : pt.type === 'fuel' ? '#f59e0b' : '#38bdf8';
       ctx.beginPath();
       ctx.arc(pt.x, pt.y, isEndpoint ? 8 : 5, 0, Math.PI * 2);
       ctx.fill();
@@ -145,7 +192,6 @@ export function NavigationMap({ speed }: { speed: number }) {
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Зона предупреждения
       ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -169,7 +215,7 @@ export function NavigationMap({ speed }: { speed: number }) {
     const curY = p1.y + (p2.y - p1.y) * subProg;
     const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 
-    // Радарная зона безопасности собственного борта
+    // Радарная зона безопасности
     ctx.strokeStyle = 'rgba(229, 155, 43, 0.4)';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -200,17 +246,25 @@ export function NavigationMap({ speed }: { speed: number }) {
     ctx.fillStyle = '#fcd34d';
     ctx.fillText('ВЫ (БОРТ #101)', curX - 44, curY - 22);
 
-  }, [progress, zoom]);
+  }, [progress, zoom, scenario]);
 
   return (
-    <div className="w-full h-full min-h-[360px] bg-[#111622] rounded-3xl border border-[#222d42] relative overflow-hidden flex flex-col shadow-inner">
+    <div className="w-full h-full min-h-[340px] bg-[#111622] rounded-3xl border border-[#222d42] relative overflow-hidden flex flex-col shadow-inner">
       {/* Верхний баннер навигационных указаний */}
       <div className="absolute top-4 left-4 z-10 flex items-center gap-3">
         <div className="bg-[#182030]/95 backdrop-blur-md px-5 py-3 rounded-2xl border border-[#2f3e5c] flex items-center gap-4 shadow-xl">
           <Navigation2 className="w-6 h-6 text-amber-400 rotate-45 animate-pulse" />
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Следующий маневр • через 280 м</div>
-            <div className="text-base font-extrabold text-slate-100">Плавный правый вираж &rarr; Подъем на Отвал (+7%)</div>
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              {scenario === 'OBSTACLE' ? 'ОБЪЕЗД ОПАСНОГО УЧАСТКА' : scenario === 'LOW_FUEL' ? 'МАРШРУТ С ЗАЕЗДОМ НА АЗС' : 'СЛЕДУЮЩИЙ МАНЕВР • ЧЕРЕЗ 280 М'}
+            </div>
+            <div className="text-base font-extrabold text-slate-100">
+              {scenario === 'OBSTACLE'
+                ? 'Вираж Сектор-2 (+350м) &rarr; Выезд на Трассу #4'
+                : scenario === 'LOW_FUEL'
+                ? 'Пункт заправки АТЗ-04 (+1640м)'
+                : 'Плавный правый вираж &rarr; Подъем на Отвал (+7%)'}
+            </div>
           </div>
         </div>
 
