@@ -4,6 +4,7 @@ import { NavigationMap } from './components/NavigationMap';
 import { HaulTaskCard, TripStage } from './components/HaulTaskCard';
 import { GaugesPanel } from './components/GaugesPanel';
 import { PredictiveAdvisorCard, ScenarioType } from './components/PredictiveAdvisorCard';
+import { NotificationCenter, DispatcherMessage } from './components/NotificationCenter';
 import { voiceAdvisor } from './services/voiceAdvisor';
 
 export default function App() {
@@ -16,6 +17,27 @@ export default function App() {
   const [scenario, setScenario] = useState<ScenarioType>('NORMAL');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
+  const [speedLimit, setSpeedLimit] = useState(40);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  const [messages, setMessages] = useState<DispatcherMessage[]>([
+    {
+      id: 'msg-1',
+      time: '11:30',
+      type: 'blast',
+      title: 'Плановые взрывные работы (БВР)',
+      body: 'В 13:00 запланированы БВР на горизонте +1680. Всем бортам покинуть опасную зону радиусом 500 м до 12:45.',
+      acknowledged: false,
+    },
+    {
+      id: 'msg-2',
+      time: '11:15',
+      type: 'info',
+      title: 'Маршрутизация рейса',
+      body: 'После рейса #14 ваш самосвал закреплен за забоем #7 (Hitachi EX3600) для поддержания плановой производительности.',
+      acknowledged: true,
+    },
+  ]);
 
   const handleSelectScenario = (s: ScenarioType) => {
     setScenario(s);
@@ -31,6 +53,7 @@ export default function App() {
       }
     } else if (s === 'OVERLOAD') {
       setPayload(138.4);
+      setSpeedLimit(20);
       if (voiceEnabled) {
         voiceAdvisor.speak('Предупреждение. Перегруз кузова сто тридцать восемь тонн. Включите ретардер и снизьте скорость до двадцати километров в час.');
       }
@@ -41,6 +64,7 @@ export default function App() {
     } else if (s === 'NORMAL') {
       setFuel(415);
       setPayload(128.5);
+      setSpeedLimit(40);
       if (voiceEnabled) {
         voiceAdvisor.speak('Параметры в норме. Следуйте по штатному маршруту.');
       }
@@ -85,20 +109,37 @@ export default function App() {
   const handleAdvanceStage = () => {
     if (tripStage === 'TO_EXCAVATOR') {
       setTripStage('LOADING');
+      setSpeedLimit(20);
       if (voiceEnabled) voiceAdvisor.speak('Прибытие в забой зафиксировано. Идет погрузка.');
     } else if (tripStage === 'LOADING') {
       setPayload(129.8);
       setTripStage('TO_DUMP');
+      setSpeedLimit(40);
       if (voiceEnabled) voiceAdvisor.speak('Погрузка завершена. Следуйте на отвал Восток.');
     } else if (tripStage === 'TO_DUMP') {
       setTripStage('UNLOADING');
+      setSpeedLimit(15);
       if (voiceEnabled) voiceAdvisor.speak('Прибыли на отвал. Начните разгрузку кузова.');
     } else if (tripStage === 'UNLOADING') {
       setPayload(0.0);
       setTripNumber((n) => n + 1);
       setTripStage('TO_EXCAVATOR');
+      setSpeedLimit(40);
       if (voiceEnabled) voiceAdvisor.speak(`Разгрузка завершена. Начат рейс номер ${tripNumber + 1}.`);
     }
+  };
+
+  const handleAcknowledgeMessage = (id: string) => {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, acknowledged: true } : m))
+    );
+    setActiveAlert('Ознакомление с распоряжением подтверждено диспетчеру');
+    setTimeout(() => setActiveAlert(null), 3000);
+  };
+
+  const handleSendReport = (type: string, note: string) => {
+    setActiveAlert(`Доклад "${type}" отправлен диспетчеру`);
+    setTimeout(() => setActiveAlert(null), 3500);
   };
 
   const handleQuickAction = (action: string) => {
@@ -112,6 +153,8 @@ export default function App() {
     setTimeout(() => setActiveAlert(null), 3500);
   };
 
+  const unreadCount = messages.filter((m) => !m.acknowledged).length;
+
   return (
     <div className="h-screen w-screen bg-slate-100 p-3.5 flex flex-col gap-2.5 font-sans overflow-hidden select-none">
       {/* Верхний статус-бар планшета */}
@@ -120,12 +163,23 @@ export default function App() {
         driverName="Доржиев Э. Д."
         shiftName="Смена #1 (08:00 – 20:00)"
         sosActive={sosActive}
+        unreadAlertsCount={unreadCount}
+        onOpenNotifications={() => setNotifOpen(true)}
         onToggleSos={() => {
           setSosActive(!sosActive);
           if (!sosActive && voiceEnabled) {
             voiceAdvisor.speak('Внимание! Сигнал аварии и координаты самосвала отправлены в диспетчерский центр.', 'urgent');
           }
         }}
+      />
+
+      {/* Всплывающий модальный центр сообщений */}
+      <NotificationCenter
+        messages={messages}
+        onAcknowledge={handleAcknowledgeMessage}
+        onSendReport={handleSendReport}
+        isOpen={notifOpen}
+        onClose={() => setNotifOpen(false)}
       />
 
       {/* Оповещение быстрого действия */}
@@ -137,10 +191,10 @@ export default function App() {
 
       {/* Основной двухколоночный лейаут */}
       <div className="flex-1 grid grid-cols-12 gap-3 min-h-0">
-        {/* Левая колонка: Векторная навигационная карта и активное рейсовое задание */}
+        {/* Левая колонка: Векторная навигационная карта (Google Maps 2.5D) и активное задание */}
         <div className="col-span-8 flex flex-col gap-2.5 min-h-0">
           <div className="flex-1 min-h-0">
-            <NavigationMap speed={speed} scenario={scenario} />
+            <NavigationMap speed={speed} scenario={scenario} speedLimit={speedLimit} />
           </div>
 
           <HaulTaskCard
@@ -151,7 +205,7 @@ export default function App() {
           />
         </div>
 
-        {/* Правая колонка: Предиктивный ассистент ИИ, приборы HUD, тензодатчики */}
+        {/* Правая колонка: Предиктивный советник ИИ, приборы HUD, датчики */}
         <div className="col-span-4 flex flex-col gap-2.5 min-h-0 overflow-y-auto pr-0.5">
           <PredictiveAdvisorCard
             scenario={scenario}
